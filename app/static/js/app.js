@@ -12,6 +12,12 @@ Vue.component('app-header', {
           <li class="nav-item active">
             <router-link class="nav-link" to="/">Home <span class="sr-only">(current)</span></router-link>
           </li>
+          
+          </li>
+          <li class="nav-item active">
+            <router-link class="nav-link" to="/upload">Upload</router-link>
+          </li>
+          
         </ul>
       </div>
     </nav>
@@ -40,10 +46,63 @@ const Home = Vue.component('home', {
     }
 });
 
+
+const Upload = Vue.component('upload-form', {
+    template: `
+     <form id="uploadForm" @submit.prevent="uploadPhoto" method="POST" enctype="multipart/form-data">
+      <h1> Photo Upload </h1>
+  
+      <div>
+      <label for="msg">Description</label>
+      </div>
+      <div>
+      <textarea id="description" name="description"></textarea>
+      </div>
+
+      <div>
+      <label for="msg">Photo Upload</label>
+      </div>
+      
+      <div>
+      <input type="file" name="photo" />
+      </div>
+      <button type="submit">Submit</button>
+    
+     </form>
+    `,
+    methods: {
+        uploadPhoto: function() {
+            let self = this;
+            let uploadForm = document.getElementById('uploadForm');
+            let form_data = new FormData(uploadForm); 
+            fetch("/api/upload", {method: 'POST',
+                body: form_data,
+                headers: {
+                    'X-CSRFToken': token
+                },
+                credentials: 'same-origin' 
+            })
+            .then(function (response) {
+                return response.json();
+                })
+            .then(function (jsonResponse) {
+                // display a success message
+                console.log(jsonResponse);
+                })
+            .catch(function (error) {
+                console.log(error);
+            });
+        }
+    }
+});
+
+
+
 // Define Routes
 const router = new VueRouter({
     routes: [
-        { path: "/", component: Home }
+        { path: "/", component: Home },
+        { path: "/upload", component: Upload }
     ]
 });
 
